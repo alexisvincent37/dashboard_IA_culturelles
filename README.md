@@ -36,8 +36,9 @@ culture_ia/
 ### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/AffreuxLoup/culture-ia-dashboard.git
-cd culture-ia-dashboard
+git clone https://github.com/alexisvincent37/dashboard_IA_culturelles
+cd dashboard_IA_culturelles
+
 ```
 
 ### 2. Installer les dépendances
