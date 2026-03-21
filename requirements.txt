@@ -1,0 +1,9 @@
+polars
+streamlit
+plotly
+numpy
+scikit-learn
+tqdm
+requests
+pytest
+pytest-cov

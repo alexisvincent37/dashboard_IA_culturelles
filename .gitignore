@@ -1,0 +1,5 @@
+*.parquet
+__pycache__/
+*.csv
+n8n projet fac/
+!bias_scores.parquet
