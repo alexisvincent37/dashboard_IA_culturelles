@@ -94,7 +94,7 @@ Une fois les données Compar:IA en place, lancer le script de nettoyage depuis l
 ```bash
 python data/data_cleaning.py
 ```
-
+Cette étape prend quelques minutes.
 ---
 
 ## Lancer le dashboard
