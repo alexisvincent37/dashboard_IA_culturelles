@@ -11,6 +11,7 @@ from data.data_manager import (
     render_bias_bar,
     render_bias_domain_bar,
     bias_badges_html,
+    render_tfidf_terms,
     BIAS_LEGEND_HTML,
 )
 
@@ -217,4 +218,28 @@ with bcol2:
 </div>
 {BIAS_LEGEND_HTML}
 {region_bars}
+</div>""", unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ── TF-IDF ───────────────────────────────────────────────────────────────────
+st.markdown("""<div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:#A78BFA;
+text-transform:uppercase;letter-spacing:0.14em;margin-bottom:12px;">
+◆ &nbsp;Signature lexicale — Top termes TF-IDF</div>""", unsafe_allow_html=True)
+
+tfidf_disc = d.get("tfidf_discriminants", [])
+tfidf_comm = d.get("tfidf_communs", [])
+if tfidf_disc or tfidf_comm:
+    st.markdown(f"""<div class="block-card">
+<div class="block-header">
+<span>Termes les plus caractéristiques du modèle vs les autres</span>
+<span class="block-source">TF-IDF · corpus culturel FR · top 30</span>
+</div>
+{render_tfidf_terms(tfidf_disc, tfidf_comm)}
+</div>""", unsafe_allow_html=True)
+else:
+    st.markdown("""<div class="block-card">
+<div style="font-family:'DM Mono',monospace;font-size:0.70rem;color:#475569;">
+Données TF-IDF non disponibles — relance run_bias.py pour les générer.
+</div>
 </div>""", unsafe_allow_html=True)

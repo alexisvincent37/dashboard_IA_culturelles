@@ -1,5 +1,6 @@
 import polars as pl
 import os
+import json
 import streamlit as st
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -649,34 +650,37 @@ def get_model_badges(df_react, df_conv, model, version):
 BIAS_PATH = os.path.join("data", "bias_analysis", "bias_scores.parquet")
  
 @st.cache_data
-def load_bias_data():
+def load_bias_data() -> dict:
     """
-    Charge le bias_scores.parquet et retourne un dict {model: {...}}.
-    Toutes les valeurs viennent directement du fichier généré par run_bias.py —
-    rien n'est inventé ou estimé ici.
+    Charge bias_scores.parquet et retourne un dict {model: {...}} prêt à l'affichage.
+    Toutes les valeurs viennent directement du fichier généré par run_bias.py.
+
+    Returns:
+        Dict indexé par nom de modèle, chaque entrée contenant scores, couvertures,
+        distributions périodes/domaines/régions/types, top termes TF-IDF,
+        badges et descriptions textuelles. Retourne {} si le fichier est absent.
     """
-    import json
-    import numpy as np
- 
     if not os.path.exists(BIAS_PATH):
         return {}
- 
-    df = pl.read_parquet(BIAS_PATH)
+
+    df   = pl.read_parquet(BIAS_PATH)
     data = {}
- 
+
     for row in df.to_dicts():
-        model   = row["model"]
-        j_per   = json.loads(row.get("joconde_periodes") or "{}")
-        j_dom   = json.loads(row.get("joconde_domaines") or "{}")
-        b_reg   = json.loads(row.get("basilic_regions")  or "{}")
-        b_typ   = json.loads(row.get("basilic_types")    or "{}")
-        j_score = row.get("joconde_score",      0)
-        b_score = row.get("basilic_score",      0)
-        j_cov   = row.get("joconde_couverture", 0)
-        b_cov   = row.get("basilic_couverture", 0)
- 
+        model      = row["model"]
+        j_per      = json.loads(row.get("joconde_periodes") or "{}")
+        j_dom      = json.loads(row.get("joconde_domaines") or "{}")
+        b_reg      = json.loads(row.get("basilic_regions")  or "{}")
+        b_typ      = json.loads(row.get("basilic_types")    or "{}")
+        tfidf_d    = json.loads(row.get("tfidf_discriminants") or "[]")
+        tfidf_c    = json.loads(row.get("tfidf_communs")       or "[]")
+        j_score    = row.get("joconde_score",      0)
+        b_score    = row.get("basilic_score",      0)
+        j_cov      = row.get("joconde_couverture", 0)
+        b_cov      = row.get("basilic_couverture", 0)
+
         j_badges, b_badges = [], []
- 
+
         if j_per.get("Moyen Âge", {}).get("ia", 0) > 50:
             j_badges.append(("r", "Obsession Moyen Âge"))
         if j_per.get("XXe siècle", {}).get("ia", 0) < 15:
@@ -685,32 +689,34 @@ def load_bias_data():
             j_badges.append(("r", "Fort biais historique"))
         else:
             j_badges.append(("g", "Adéquation historique OK"))
- 
+
         if b_reg.get("Île-de-France", {}).get("ia", 0) > 25:
             b_badges.append(("r", "Parisiano-centrisme"))
         if b_typ.get("Théâtres & Opéras", {}).get("ia", 0) > 20:
             b_badges.append(("a", "Biais spectacle vivant"))
         if b_score >= 40:
             b_badges.append(("r", "Invisibilisation des régions"))
- 
+
         if not j_badges: j_badges = [("b", "Score standard")]
         if not b_badges: b_badges = [("b", "Score standard")]
- 
+
         data[model] = {
             "joconde_score":      j_score,
             "joconde_couverture": j_cov,
             "joconde_periodes":   j_per,
             "joconde_domaines":   j_dom,
             "joconde_badges":     j_badges,
-            "joconde_desc":       f"Analyse sémantique sur corpus filtré (conversations culturelles FR) vs 580k œuvres Joconde.",
+            "joconde_desc":       "Analyse sémantique sur corpus filtré (conversations culturelles FR) vs 580k oeuvres Joconde.",
             "basilic_score":      b_score,
             "basilic_couverture": b_cov,
             "basilic_regions":    b_reg,
             "basilic_types":      b_typ,
             "basilic_badges":     b_badges,
             "basilic_desc":       f"Cartographie des équipements cités par {model} vs le maillage territorial Basilic (86k équipements).",
+            "tfidf_discriminants": tfidf_d,
+            "tfidf_communs":       tfidf_c,
         }
- 
+
     return data
  
  
@@ -783,7 +789,61 @@ def render_bias_domain_bar(label: str, delta: float) -> str:
  
  
 def bias_badges_html(badges: list) -> str:
+    """Convertit une liste de badges (couleur, texte) en HTML."""
     return "".join(f'<span class="badge badge-{t}">{txt}</span>' for t, txt in badges)
+
+
+def render_tfidf_terms(discriminants: list[str], communs: list[str]) -> str:
+    """
+    Génère un bloc HTML affichant les top termes TF-IDF en deux sections :
+    - discriminants : termes qui distinguent ce modèle des autres (tags bleus)
+    - communs       : termes culturels partagés par tous les modèles (tags gris)
+
+    Args:
+        discriminants : liste ordonnée par score TF-IDF décroissant.
+        communs       : liste de termes culturels présents mais non discriminants.
+
+    Returns:
+        HTML string avec deux blocs de tags, ou chaîne vide si les deux listes sont vides.
+    """
+    if not discriminants and not communs:
+        return ""
+
+    def _tags(terms: list[str], color: str, border: str) -> str:
+        return "".join(
+            f'<span style="display:inline-block;background:rgba({color},0.08);color:rgba({color},1);'
+            f'border:1px solid rgba({border},0.2);border-radius:4px;padding:2px 8px;'
+            f'font-family:DM Mono,monospace;font-size:0.62rem;margin:2px;">{t}</span>'
+            for t in terms
+        )
+
+    disc_html = ""
+    if discriminants:
+        disc_html = f"""
+<div style="margin-bottom:10px;">
+<div style="font-family:DM Mono,monospace;font-size:0.60rem;color:#475569;
+text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">
+Signature propre — distingue ce modèle des autres
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:2px;">
+{_tags(discriminants, "96,165,250", "96,165,250")}
+</div>
+</div>"""
+
+    comm_html = ""
+    if communs:
+        comm_html = f"""
+<div>
+<div style="font-family:DM Mono,monospace;font-size:0.60rem;color:#475569;
+text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">
+Vocabulaire commun — partagé avec tous les modèles
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:2px;">
+{_tags(communs, "100,116,139", "100,116,139")}
+</div>
+</div>"""
+
+    return disc_html + comm_html
  
  
 BIAS_LEGEND_HTML = """<div style="display:flex;gap:16px;margin-bottom:12px;">
@@ -794,5 +854,3 @@ BIAS_LEGEND_HTML = """<div style="display:flex;gap:16px;margin-bottom:12px;">
 <span style="display:inline-block;width:20px;height:4px;background:#F59E0B;border-radius:2px;opacity:0.75;"></span> Référence
 </span>
 </div>"""
- 
- 

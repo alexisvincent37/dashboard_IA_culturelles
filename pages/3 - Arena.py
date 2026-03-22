@@ -106,8 +106,6 @@ if "sel_conv" not in st.session_state:
     st.session_state.sel_conv = None
 
 with st.sidebar:
-    st.markdown("### 🏟️ Arena")
-    st.markdown("---")
     st.markdown('<div class="slabel">Filtres</div>', unsafe_allow_html=True)
 
     sel_m1  = st.selectbox("Modèle 1", ["Tous"] + all_models, key="m1")
@@ -168,7 +166,7 @@ if st.session_state.sel_conv is not None:
         st.session_state.sel_conv = None
 
 if st.session_state.sel_conv is None:
-    st.title("🏟️ Arena")
+    st.title("Arena")
     st.markdown(
         '<div style="font-family:\'DM Mono\',monospace;font-size:0.68rem;color:#475569;margin-bottom:2px;">'
         'EXPLORATEUR DE CONVERSATIONS · Votes Compar:IA</div>',
@@ -250,7 +248,7 @@ else:
     else:
         verdict = '<span class="winner-eq">— Sans verdict</span>'
 
-    st.title(f"🏟️ {ma} vs {mb}")
+    st.title(f"{ma} vs {mb}")
     st.markdown(
         f'<div style="font-family:\'DM Mono\',monospace;font-size:0.68rem;color:#475569;margin-bottom:8px;">'
         f'{cat} &nbsp;·&nbsp; {turns} tour{"s" if turns > 1 else ""} &nbsp;·&nbsp; {ts}</div>',
