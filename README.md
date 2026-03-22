@@ -16,7 +16,9 @@ dashboard_IA_culturelles/
 ├── pages/
 │   ├── Statistiques IA.py       # Cockpit par modèle : winrate, conso, tokens...
 │   ├── Analyse de biais.py      # Biais culturels : Joconde + Basilic
-│   └── Arena.py                 # Explorateur de conversations
+|   ├── Arena.py                 # Explorateur de conversations
+│   └── A propos.py
+
 ├── data/
 │   ├── data_manager.py          # Toutes les fonctions de calcul et d'affichage
 │   ├── data_cleaning.py         # Script de nettoyage et préparation des données
