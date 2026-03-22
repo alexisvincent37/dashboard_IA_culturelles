@@ -138,7 +138,12 @@ def winrate(df, model, version):
         return None
     
     nul = subset.filter(pl.col("both_equal") == True).height
-    win = subset.filter((pl.col("chosen_base_model") == model) & (pl.col("both_equal") == False)).height
+    
+
+    win = subset.filter(
+        (pl.col("chosen_base_model") == model) & 
+        (pl.col("both_equal").fill_null(False) == False)
+    ).height
 
     winratio = (win + (nul * 0.5)) / total
     return round(winratio*100, 2)
