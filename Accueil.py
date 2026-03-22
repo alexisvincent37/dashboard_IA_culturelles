@@ -100,7 +100,7 @@ if __name__ == "__main__":
     k1, k2, k3, k4 = st.columns(4)
     k1.metric("Conversations analysées", f"{total_conversations:,}".replace(",", " "))
     k2.metric("Familles de modèles", total_families)
-    k3.metric("Volume de données", "2 Go")
+    k3.metric("Volume de données", "6 Go")
     k4.metric("Bases de référence", "2 · Joconde + Basilic")
 
     st.markdown("---")
@@ -118,7 +118,7 @@ if __name__ == "__main__":
                 consommation énergétique, empreinte carbone, coût estimé par token.
                 Répartition des catégories de conversations et évolution temporelle.
             </div>
-            <span class="feature-tag tag-blue">27 modèles</span>
+            <span class="feature-tag tag-blue">28 modèles</span>
             <span class="feature-tag tag-green">Par version</span>
         </div>
         """, unsafe_allow_html=True)
@@ -164,7 +164,7 @@ if __name__ == "__main__":
             <div class="data-row">
                 <div class="data-dot" style="background:#60A5FA;"></div>
                 <div class="data-label">conversations.parquet</div>
-                <div class="data-value">311 k conversations</div>
+                <div class="data-value">418 k conversations</div>
             </div>
             <div class="data-row">
                 <div class="data-dot" style="background:#34D399;"></div>
