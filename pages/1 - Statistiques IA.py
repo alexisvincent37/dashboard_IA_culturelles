@@ -157,7 +157,7 @@ with col_right:
         cost_val = cost_estimation(modinfo, selected_family, selected_version)
         total_cost = "N/A" if cost_val is None else f"{round(cost_val * total_tokens, 2)}$"
         ver_txt = selected_version if selected_version != "Tous" else "toutes versions"
-        help_cost = f"Prix pour un token {selected_family} {ver_txt} : {round(cost_val, 5)}$" if cost_val is not None else ""
+        help_cost = f"Prix pour un token {selected_family} {ver_txt} : {cost_val}$" if cost_val is not None else ""
         eco4.metric("Coût estimé", total_cost, help=help_cost)
 
     with st.container(border=True):
