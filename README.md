@@ -11,7 +11,7 @@ Les données utilisées couvrent la période jusqu'à **février 2026**.
 ## Structure du projet
 
 ```
-culture_ia/
+dashboard_IA_culturelles/
 ├── Accueil.py                   # Page d'accueil Streamlit (point d'entrée)
 ├── pages/
 │   ├── Statistiques IA.py       # Cockpit par modèle : winrate, conso, tokens...
