@@ -11,12 +11,14 @@ Les données utilisées couvrent la période jusqu'à **février 2026**.
 ## Structure du projet
 
 ```
-culture_ia/
+dashboard_IA_culturelles/
 ├── Accueil.py                   # Page d'accueil Streamlit (point d'entrée)
 ├── pages/
 │   ├── Statistiques IA.py       # Cockpit par modèle : winrate, conso, tokens...
 │   ├── Analyse de biais.py      # Biais culturels : Joconde + Basilic
-│   └── Arena.py                 # Explorateur de conversations
+|   ├── Arena.py                 # Explorateur de conversations
+│   └── A propos.py
+
 ├── data/
 │   ├── data_manager.py          # Toutes les fonctions de calcul et d'affichage
 │   ├── data_cleaning.py         # Script de nettoyage et préparation des données
