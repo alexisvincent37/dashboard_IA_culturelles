@@ -67,6 +67,47 @@ def nbtotalconv(df, model, version):
     
     return df.filter(cond).height
 
+def nbparam(df, model, version):
+    """
+    Retourne le nombre total de paramètres d'un modèle pour une version donnée.
+
+    Retourne "N/A" si version == "Tous" car les paramètres sont propres à chaque
+    version — les agréger n'aurait pas de sens (ex: GPT-4o mini vs GPT-4o).
+    On prend la valeur modale : total_params est une propriété fixe du modèle.
+
+    Note : la colonne source s'appelle "model_a_acitve_params" dans le dataset
+    Compar:IA (faute de frappe conservée pour coller au schéma réel).
+
+    Args:
+        df:      DataFrame de conversations.
+        model:   Nom de la famille de modèle.
+        version: Version spécifique. "Tous" retourne "N/A".
+
+    Returns:
+        Chaîne formatée "X Mds params", ou "N/A" si version == "Tous" ou info manquante.
+    """
+    if df is None or model is None or version == "Tous":
+        return "N/A"
+
+    cond = (
+        ((pl.col("base_model_a") == model) & (pl.col("version_a") == version)) |
+        ((pl.col("base_model_b") == model) & (pl.col("version_b") == version))
+    )
+    subset = df.filter(cond)
+
+    if subset.is_empty():
+        return "N/A"
+
+    vals_a = subset.filter(pl.col("base_model_a") == model)["model_a_total_params"].drop_nulls()
+    vals_b = subset.filter(pl.col("base_model_b") == model)["model_b_total_params"].drop_nulls()
+    vals   = pl.concat([vals_a, vals_b])
+
+    if vals.is_empty():
+        return "N/A"
+
+    most_common = vals.value_counts(sort=True).row(0)[0]
+    return f"{most_common} Mds params"
+
 def audience(df, model, version):
     if model is None or df is None:
         return 0

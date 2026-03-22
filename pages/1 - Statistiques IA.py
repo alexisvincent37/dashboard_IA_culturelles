@@ -4,7 +4,7 @@ import polars as pl
 from Accueil import df_conv, df_votes, df_react, model_structure, modinfo
 from data.data_manager import nbtotalconv, nbreactrow, satisfaction, audience, winrate, ranking, plot_treemap, electric_conso_total, \
                               electric_conso_avg, nb_tokens, nb_tokens_avg, carbon_footprint, cost_estimation, plot_panel_graph, \
-                              nb_turn, mean_turn, pick_rate, deep_engagement_rate, get_global_benchmarks, get_model_badges
+                              nb_turn, mean_turn, pick_rate, deep_engagement_rate, get_global_benchmarks, get_model_badges, nbparam
 
 st.set_page_config(page_title="Cockpit IA Culturelles", layout="wide", initial_sidebar_state="expanded")
 
@@ -87,7 +87,7 @@ else:
     st.divider()
 
 kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-kpi1.metric("📌 Version / Taille", selected_version)
+kpi1.metric("📌 Version / Taille", selected_version, help=nbparam(df_conv, selected_family, selected_version))
 kpi2.metric("💬 Conversations", nbtotalconv(df_conv, selected_family, selected_version),
             help=f"Basé sur {audience(df_conv, selected_family, selected_version)} utilisateurs différents")
 kpi3.metric("🏆 Taux de victoire", f"{winrate(df_votes, selected_family, selected_version)}%",
