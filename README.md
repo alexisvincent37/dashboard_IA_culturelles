@@ -2,7 +2,7 @@
 
 Dashboard d'analyse des usages et des biais culturels des modèles d'intelligence artificielle générative, construit sur les données de la plateforme [Compar:IA](https://comparia.beta.gouv.fr) (beta.gouv.fr).
 
-Les conversations sont croisées avec deux bases ouvertes du Ministère de la Culture — **Joconde** (580 000 oeuvres) et **Basilic** (86 000 équipements culturels) — pour mesurer les biais temporels, géographiques et par domaine artistique de chaque modèle.
+Les conversations sont croisées avec deux bases ouvertes du Ministère de la Culture — **Joconde** (988 000 oeuvres) et **Basilic** (86 000 équipements culturels) — pour mesurer les biais temporels, géographiques et par domaine artistique de chaque modèle.
 
 Les données utilisées couvrent la période jusqu'à **février 2026**.
 
